@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>CS4241 Assignment 2</title>
+        <meta charset="utf-8" />
+        <script src="js/main.js"></script>
+        <link rel="stylesheet" href="/public/css/main.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+        <!-- get rid of favicon error -->
+    </head>
+    <body>
+        <h1>
+            Track <span class="playfair-display-italic">your</span> calories
+        </h1>
+        <div class="side-by-side-container">
+            <div class="form-container">
+                <form>
+                    <label for="meal">Choose a meal:</label>
+                    <select name="meal" id="meal">
+                        <option value="breakfast">Breakfast</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                        <option value="snack">Snack</option>
+                    </select>
+                    <label for="foodName">Name of food:</label>
+                    <input
+                        type="text"
+                        id="foodName"
+                        name="foodName"
+                        placeholder="e.g. eggs"
+                    />
+                    <label for="quantity">Quantity:</label>
+                    <input
+                        type="number"
+                        id="quantity"
+                        name="quantity"
+                        placeholder="e.g. 12"
+                    />
+                    <label for="unit">Unit:</label>
+                    <select name="unit" id="unit">
+                        <option value="item(s)">item(s)</option>
+                        <option value="lb(s)">lb(s)</option>
+                        <option value="oz(s)">oz(s)</option>
+                        <option value="g">g</option>
+                        <option value="kg">kg</option>
+                        <option value="cup(s)">cup(s)</option>
+                        <option value="tbsp(s)">tbsp(s)</option>
+                        <option value="tsp(s)">tsp(s)</option>
+                    </select>
+                    <label for="calories">Calories:</label>
+                    <input
+                        type="number"
+                        id="calories"
+                        name="calories"
+                        placeholder="e.g. 200"
+                    />
+                    <button>Submit</button>
+                    <button type="button" id="clearButton">Clear</button>
+                </form>
+            </div>
+            <div class="table-container">
+                <h2>All Meals</h2>
+                <table id="mealsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Meal</th>
+                            <th>Food Name</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Calories</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mealsTableBody">
+                        <!-- Meals will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

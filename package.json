@@ -1,0 +1,19 @@
+{
+  "name": "a3-matthew-franco",
+  "version": "1.0.0",
+  "description": "Assignment 3 for Matthew Franco",
+  "author": "",
+  "scripts": {
+    "dev": "nodemon --env-file=.env server.js",
+    "start": "node --env-file=.env server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "mime": "^2.6.0",
+    "mongodb": "^6.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
