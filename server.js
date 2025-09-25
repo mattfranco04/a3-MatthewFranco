@@ -7,7 +7,7 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.static("public"));
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/?retryWrites=true&w=majority&appName=a3-persistence`;
 
 const client = new MongoClient(uri, {
@@ -27,9 +27,8 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+  } catch (e) {
+    console.error("Error connecting to MongoDB:", e); 
   }
 }
 
@@ -44,18 +43,17 @@ const collection = db.collection(collectionName);
 app.get("/", (req, res) => {
   res.render("index");
 });
+
 // GET /meals - grouped by date, with total calories
 app.get("/meals", async (req, res) => {
   try {
-    const meals = await db.collection("meals").find({}).toArray();
-    console.log("hello");
-    console.log(meals);
+    const meals = await collection.find({}).toArray();
     const grouped = {};
     meals.forEach((meal) => {
       if (!grouped[meal.date])
         grouped[meal.date] = { meals: [], totalCalories: 0 };
       grouped[meal.date].meals.push(meal);
-      grouped[meal.date].totalCalories += Number(meal.calories) || 0;
+      grouped[meal.date].totalCalories += meal.calories || 0;
     });
     res.json(grouped);
   } catch (err) {
@@ -67,8 +65,13 @@ app.get("/meals", async (req, res) => {
 app.post("/submit", async (req, res) => {
   try {
     const receivedData = req.body;
-    receivedData.id = Date.now() + Math.random().toString(36).slice(2);
+
+    if (!receivedData) {
+      return res.status(400).json({ error: "No data received" });
+    }
+
     receivedData.date = new Date().toISOString().split("T")[0];
+    console.log(new Date().toISOString());
     await collection.insertOne(receivedData);
     await sendGroupedMeals(res, "added");
   } catch (err) {
@@ -80,7 +83,12 @@ app.post("/submit", async (req, res) => {
 app.post("/delete", async (req, res) => {
   try {
     const { id } = req.body;
-    await collection.deleteOne({ id });
+
+    if (!id) {
+      return res.status(400).json({ error: "No id provided" });
+    }
+
+    await collection.deleteOne({ _id: new ObjectId(String(id)) }); // Casting id to a string or else I get a weird deprecation error
     await sendGroupedMeals(res, "deleted");
   } catch (err) {
     res.status(500).json({ error: "Failed to delete meal" });
@@ -91,7 +99,12 @@ app.post("/delete", async (req, res) => {
 app.post("/update", async (req, res) => {
   try {
     const updated = req.body;
-    await collection.updateOne({ id: updated.id }, { $set: updated });
+    console.log("Update request body:", updated);
+    if (!updated._id) {
+      return res.status(400).json({ error: "No _id provided" });
+    }
+    const { _id, ...fieldsToUpdate } = updated;
+    await collection.updateOne({ _id: new ObjectId(String(_id)) }, { $set: fieldsToUpdate });
     await sendGroupedMeals(res, "updated");
   } catch (err) {
     res.status(500).json({ error: "Failed to update meal" });
@@ -111,7 +124,6 @@ async function sendGroupedMeals(res, status) {
   res.json({ status, grouped });
 }
 
-// Fallback for 404s (if not handled by static or above routes)
 app.use((req, res) => {
   res.status(404).send("404 Error: File Not Found");
 });

@@ -18,8 +18,8 @@ const renderMealsTable = (date) => {
       <td>${meal.unit || ""}</td>
       <td>${meal.calories || ""}</td>
       <td>
-        <button class="edit-btn" data-id="${meal.id}">Edit</button>
-        <button class="delete-btn" data-id="${meal.id}">Delete</button>
+  <button class="edit-btn" data-id="${meal._id}">Edit</button>
+  <button class="delete-btn" data-id="${meal._id}">Delete</button>
       </td>
     `;
     mealList.appendChild(row);
@@ -30,15 +30,17 @@ const renderMealsTable = (date) => {
   if (tfoot) tfoot.remove();
   const table = document.getElementById("mealsTable");
   const foot = document.createElement("tfoot");
-  foot.innerHTML = `<tr><td colspan="5"><b>Total Calories</b></td><td colspan="2">${(allMealsByDate[date] && allMealsByDate[date].totalCalories) || 0}</td></tr>`;
+  // Calculate total calories for the day as a number
+  const totalCalories = mealsForDate.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+  foot.innerHTML = `<tr><td colspan="5"><b>Total Calories</b></td><td colspan="2">${totalCalories}</td></tr>`;
   table.appendChild(foot);
 
   // Add event listeners for edit/delete
   document.querySelectorAll(".edit-btn").forEach((btn) => {
-    btn.onclick = () => startEditMeal(btn.dataset.id, date);
+  btn.onclick = () => startEditMeal(btn.dataset.id, date);
   });
   document.querySelectorAll(".delete-btn").forEach((btn) => {
-    btn.onclick = () => deleteMeal(btn.dataset.id);
+  btn.onclick = () => deleteMeal(btn.dataset.id);
   });
 };
 
@@ -101,9 +103,10 @@ const submit = async function (event) {
   }
 
   if (editingMealId) {
-    data.id = editingMealId;
+    data._id = editingMealId;
     await fetch("/update", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     editingMealId = null;
@@ -112,6 +115,7 @@ const submit = async function (event) {
   } else {
     await fetch("/submit", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     form.reset();
@@ -122,6 +126,7 @@ const submit = async function (event) {
 const deleteMeal = async (id) => {
   await fetch("/delete", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id }),
   });
   fetchAndRenderMeals(dateList[currentDateIndex]);
@@ -129,7 +134,7 @@ const deleteMeal = async (id) => {
 
 const startEditMeal = (id, date) => {
   const meal =
-    allMealsByDate[date] && allMealsByDate[date].meals.find((m) => m.id === id);
+    allMealsByDate[date] && allMealsByDate[date].meals.find((m) => m._id === id);
   if (!meal) return;
   editingMealId = id;
   const form = document.querySelector("form");
@@ -154,30 +159,6 @@ const nextDate = () => {
   currentDateIndex = (currentDateIndex + 1) % dateList.length;
   updateDateNav();
   renderMealsTable(dateList[currentDateIndex]);
-};
-
-const viewMeals = async function () {
-  const response = await fetch("/meals", {
-    method: "GET",
-  });
-
-  const meals = await response.json();
-  console.log("meals:", meals);
-
-  const mealList = document.getElementById("mealsTableBody");
-  mealList.innerHTML = "";
-  meals.forEach((meal) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${meal.date || ""}</td>
-      <td>${meal.meal || ""}</td>
-      <td>${meal.foodName || ""}</td>
-      <td>${meal.quantity || ""}</td>
-      <td>${meal.unit || ""}</td>
-      <td>${meal.calories || ""}</td>
-    `;
-    mealList.appendChild(row);
-  });
 };
 
 window.onload = function () {
@@ -212,6 +193,7 @@ window.onload = function () {
     document.getElementById("nextDateBtn").onclick = nextDate;
     navDiv.appendChild(document.createElement("br"));
   }
+
   updateDateNav();
   fetchAndRenderMeals();
 };
