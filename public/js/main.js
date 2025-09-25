@@ -31,7 +31,7 @@ const renderMealsTable = (date) => {
   const table = document.getElementById("mealsTable");
   const foot = document.createElement("tfoot");
   // Calculate total calories for the day as a number
-  const totalCalories = mealsForDate.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+  const totalCalories = mealsForDate.reduce((sum, meal) => sum + (Number(meal.calories) || 0), 0);
   foot.innerHTML = `<tr><td colspan="5"><b>Total Calories</b></td><td colspan="2">${totalCalories}</td></tr>`;
   table.appendChild(foot);
 
