@@ -36,6 +36,8 @@ I used Bootstrap 5 for the UI because it provides a robust grid system, responsi
 
 ### Google Lighthouse Scores
 
+![Google Lighthouse Scores](public/img/Screenshot%202025-09-25%20at%203.23.30%E2%80%AFPM.png)
+
 ### HTML Input Tags
 
 My calorie tracker form uses a variety of semantic HTML input tags to ensure accessibility, usability, and proper data validation:
@@ -68,3 +70,7 @@ Alignment is carefully managed using Bootstrap's flexbox and grid utilities. For
 
 **Proximity:**
 Proximity is used to group related information and actions together. Form fields for adding a meal are placed close to their labels and submit buttons, making it clear which inputs belong together. The meals table is positioned directly below the form, allowing users to see their entries immediately after submission. By grouping related elements, the site reduces confusion and helps users complete tasks efficiently. Proximity also enhances the overall organization of the page, making it easier to navigate and understand.
+
+### Use of AI
+
+GitHub Copilot was used durinh the coding process to suggest code snippets, refactor logic, and generate boilerplate for both backend and frontend components. Copilot provided helpful recommendations for Express route handlers, EJS templates, and Bootstrap-based UI layouts, reducing manual effort and minimizing errors. AI assistance also helped with documentation, including generating README sections and summarizing technical achievements.
