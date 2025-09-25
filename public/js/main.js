@@ -10,6 +10,7 @@ const renderMealsTable = (date) => {
     (allMealsByDate[date] && allMealsByDate[date].meals) || [];
   mealsForDate.forEach((meal) => {
     const row = document.createElement("tr");
+    row.classList.add("small"); // Bootstrap class for smaller text
     row.innerHTML = `
       <td>${meal.date || ""}</td>
       <td>${meal.meal || ""}</td>
@@ -18,8 +19,8 @@ const renderMealsTable = (date) => {
       <td>${meal.unit || ""}</td>
       <td>${meal.calories || ""}</td>
       <td>
-  <button class="edit-btn" data-id="${meal._id}">Edit</button>
-  <button class="delete-btn" data-id="${meal._id}">Delete</button>
+        <button class="edit-btn btn btn-outline-secondary btn-sm me-1" data-id="${meal._id}">Edit</button>
+        <button class="delete-btn btn btn-outline-danger btn-sm" data-id="${meal._id}">Delete</button>
       </td>
     `;
     mealList.appendChild(row);
@@ -32,7 +33,7 @@ const renderMealsTable = (date) => {
   const foot = document.createElement("tfoot");
   // Calculate total calories for the day as a number
   const totalCalories = mealsForDate.reduce((sum, meal) => sum + (Number(meal.calories) || 0), 0);
-  foot.innerHTML = `<tr><td colspan="5"><b>Total Calories</b></td><td colspan="2">${totalCalories}</td></tr>`;
+  foot.innerHTML = `<tr class="table-warning fs-4"><td colspan="5"><b>Total Calories</b></td><td colspan="2"><b>${totalCalories}</b></td></tr>`;
   table.appendChild(foot);
 
   // Add event listeners for edit/delete
