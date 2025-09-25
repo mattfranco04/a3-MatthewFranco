@@ -50,14 +50,6 @@ passport.use(new GitHubStrategy({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
-});
-
-app.get('/login', function(req, res){
-  res.render('login', { user: req.user });
-});
-
 // GET /auth/github
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  The first step in GitHub authentication will involve redirecting
@@ -93,10 +85,11 @@ app.get('/logout', function(req, res){
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  res.redirect('/')
 }
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const e = require("express");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/?retryWrites=true&w=majority&appName=a3-persistence`;
 
 const client = new MongoClient(uri, {
@@ -133,12 +126,8 @@ app.get("/", (req, res) => {
   res.render("login");
 });
 
-app.get("/home", (req, res) => {
-  if (req.isAuthenticated()) {
+app.get("/home", ensureAuthenticated, (req, res) => {
     res.render("index", { user: req.user });
-  } else {
-    res.redirect('/login');
-  }
 });
 
 // GET /meals - grouped by date, with total calories

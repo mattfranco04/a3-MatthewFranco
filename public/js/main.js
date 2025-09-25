@@ -54,7 +54,7 @@ const updateDateNav = () => {
     navDiv.insertBefore(label, navDiv.children[1] || null);
   }
   label.style.fontSize = "2rem";
-  label.style.color = "white";
+  label.style.color = "black";
   label.style.fontWeight = "bold";
   if (dateList.length === 0) {
     label.textContent = "No meals yet";
@@ -186,7 +186,7 @@ window.onload = function () {
     navDiv.style.alignItems = "center";
     navDiv.style.justifyContent = "center";
     navDiv.style.gap = "10px";
-    const tableContainer = document.querySelector(".table-container");
+    const tableContainer = document.getElementById("table-container");
     tableContainer.insertBefore(navDiv, tableContainer.firstChild);
     navDiv.innerHTML = `<button id="prevDateBtn">&#8592;</button><span id="dateNavLabel"></span><button id="nextDateBtn">&#8594;</button>`;
     document.getElementById("prevDateBtn").onclick = prevDate;
