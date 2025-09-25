@@ -2,10 +2,99 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.set("view engine", "ejs");
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+const partials = require('express-partials');
+const passport = require("passport");
+const GitHubStrategy = require('passport-github2').Strategy;
 
-app.use(express.json());
-app.use(express.static("public"));
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.use(partials());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(methodOverride());
+app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(__dirname + '/public'));
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+
+passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: "http://127.0.0.1:3000/auth/github/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      
+      // To keep the example simple, the user's GitHub profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the GitHub account with a user record in your database,
+      // and return that user instead.
+      return done(null, profile);
+    });
+  }
+));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('/account', ensureAuthenticated, function(req, res){
+  res.render('account', { user: req.user });
+});
+
+app.get('/login', function(req, res){
+  res.render('login', { user: req.user });
+});
+
+// GET /auth/github
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request.  The first step in GitHub authentication will involve redirecting
+//   the user to github.com.  After authorization, GitHub will redirect the user
+//   back to this application at /auth/github/callback
+app.get('/auth/github',
+  passport.authenticate('github', { scope: [ 'user:email' ] }),
+  function(req, res){
+    // The request will be redirected to GitHub for authentication, so this
+    // function will not be called.
+  });
+
+// GET /auth/github/callback
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request.  If authentication fails, the user will be redirected back to the
+//   login page.  Otherwise, the primary route function will be called,
+//   which, in this example, will redirect the user to the home page.
+app.get('/auth/github/callback', 
+  passport.authenticate('github', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/home');
+  });
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+// Simple route middleware to ensure user is authenticated.
+//   Use this route middleware on any resource that needs to be protected.  If
+//   the request is authenticated (typically via a persistent login session),
+//   the request will proceed.  Otherwise, the user will be redirected to the
+//   login page.
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
+}
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/?retryWrites=true&w=majority&appName=a3-persistence`;
@@ -41,7 +130,15 @@ const db = client.db(dbName);
 const collection = db.collection(collectionName);
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("login");
+});
+
+app.get("/home", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render("index", { user: req.user });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // GET /meals - grouped by date, with total calories

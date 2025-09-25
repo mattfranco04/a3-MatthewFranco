@@ -10,8 +10,13 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-partials": "^0.3.0",
+    "express-session": "^1.18.2",
+    "method-override": "^3.0.0",
     "mime": "^2.6.0",
-    "mongodb": "^6.20.0"
+    "mongodb": "^6.20.0",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
